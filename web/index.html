@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <link rel="stylesheet" href="css/element-ui.css">
+    <script type="text/javascript" src="js/vue.js"></script>
+    <script type="text/javascript" src="js/element-ui.js"></script>
+    <script type="text/javascript" src="js/axios.js"></script>
+    <!-- axios.js,是一个网络请求库，用于向服务端发送数据或者接收服务端数据 -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        #app {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: #333;
+        }
+        .container{
+            width: 70%;
+            height: 60%;
+            margin: 10% auto;
+            display: flex;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .container .left-img{
+            width: 60%;
+            height: 100%;
+        }
+        .container .right-box{
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+        }
+        .container .right-box img{
+            width: 200px;
+            height: 50px;
+        }
+    </style>
+
+</head>
+<body>
+<div id="app">
+    <div class="container">
+        <img class="left-img" src="image/login-l.png" alt="">
+        <div class="right-box">
+            <img src="image/logo.png" alt="" />
+
+            <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+                <el-form-item label="账号" prop="name">
+                    <el-input type="text" v-model="ruleForm.name" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="密码" prop="password">
+                    <el-input type="password" v-model="ruleForm.password" autocomplete="off"></el-input>
+                </el-form-item>
+
+                <el-form-item>
+                    <el-button type="primary"  style="width:200px" @click="submitForm('ruleForm')">登录</el-button>
+
+                </el-form-item>
+            </el-form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    new Vue({
+        el:'#app',//跟上方的vue容器
+        data() {
+            var validatePass = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('请输入账号'));
+                }else{
+                    callback();
+                }
+            };
+            var validatePass2 = (rule, value, callback) => {
+                if (value === '') {
+                    callback(new Error('请输入密码'));
+                } else if (value.length<6) {
+                    callback(new Error('密码不能小于6位数！'));
+                } else {
+                    callback();
+                }
+            };
+            return {
+                ruleForm: {
+                    name:"",
+                    password:""
+                },
+                rules: {
+                    name: [
+                        { validator: validatePass, trigger: 'blur' }
+                    ],
+                    password: [
+                        { validator: validatePass2, trigger: 'change' }
+                    ],
+
+                }
+            };
+        },
+        methods: {
+            submitForm(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        //表单校验通过，继续登录流程
+                        //发起一个get请求，请求服务端接口，进行登录验证
+                        // axios.get(url, {
+                        //     params: {}//get方式传参属性名，里面放键值对
+                        // }).then(res => {//请求成功的回调函数
+                        //     if (res.data.code === 200) {
+                        //         alert('登录成功！');
+                        //         //跳转到首页
+                        //         window.location.href = 'index.html';
+                        //     }
+                        // }).catch(error => {//请求失败的回调函数
+                        //     console.log(error);
+                        // });
+                        // console.log(this.ruleForm);
+                        axios.get("/login", {
+                            params: this.ruleForm
+                        }).then((res) => {
+                            if (res.data.code === "200") {
+                                alert('登录成功！123123');
+                            }
+                        }).catch((error) => {
+                            console.log(error);
+                            alert('登录失败！');
+                        });
+                        // alert(`账户：${this.ruleForm.name}，密码：${this.ruleForm.password}`);
+                        // console.log('submit')
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            }
+        }
+    })
+</script>
